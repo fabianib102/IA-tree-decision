@@ -1,0 +1,24 @@
+{
+  "name": "IA-tree-decision",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabianib102/IA-tree-decision.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fabianib102/IA-tree-decision/issues"
+  },
+  "homepage": "https://github.com/fabianib102/IA-tree-decision#readme",
+  "dependencies": {
+    "electron": "^15.0.0"
+  }
+}
