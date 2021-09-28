@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/fabianib102/IA-tree-decision#readme",
   "dependencies": {
-    "electron": "^15.0.0"
+    "electron": "^15.0.0",
+    "electron-reload": "^2.0.0-alpha.1"
   },
   "devDependencies": {
     "electron-packager": "^15.4.0"
