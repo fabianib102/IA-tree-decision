@@ -17,81 +17,31 @@
       <div class="row">
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#home">Carga de datos (Raíz)</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#variable"
+              >Carga de datos</a
+            >
           </li>
           <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#variable">Carga de datos (Variables)</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#execution">Ejecución</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#execution"
+              >Ejecución del Algoritmo</a
+            >
           </li>
         </ul>
 
         <div id="myTabContent" class="tab-content">
-
-          <div class="tab-pane fade tabCustom active show" id="home">
+          
+          <div class="tab-pane fade tabCustom active show" id="variable">
             <div class="row">
               <div class="mb-3 col-lg-6">
-                <label class="form-label">Ingresa el nombre de la raíz</label>
-                <input type="text" class="form-control form-control-sm" id="rootName" />
-              </div>
-              <div class="col-lg-3">
-                <label class="form-label">Cantidad de valores a ingresar</label>
-                <input type="number" class="form-control form-control-sm" id="quantity"/>
-              </div>
-              <div class="col-lg-3 btn-accept">
-                <button type="button" class="btn btn-success btn-sm" onclick=saveRoot()>Aceptar</button>
-                <button type="button" class="btn btn-warning btn-sm" onclick=rebootRoot()>Reiniciar</button>
-              </div>
-            </div>
-
-            <div class="row" id="divValues">
-              <div class="col-lg-4">
-                <div class="input-group mb-3">
-                  <input type="text" class="form-control form-control-sm" id="valueRoot" placeholder="Valor N° 1" />
-                  <button class="btn btn-success btn-sm" type="button" onclick=addValueRoot()>Agregar</button>
-                </div>
-              </div>
-              <div class="col-lg-8">
-                <label class="form-label">Valores cargados:</label>
-                <div id="divLoades">
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="tab-pane fade tabCustom" id="variable">
-            <div class="row">
-              <div class="mb-3 col-lg-6">
-                <label for="rootName" class="form-label">Ingresa el nombre de la variable</label>
-                <input type="text" class="form-control form-control-sm" id="" />
-              </div>
-              <div class="col-lg-3">
-                <label for="rootName" class="form-label">Cantidad de valores a ingresar</label>
-                <input type="number" class="form-control form-control-sm" />
-              </div>
-              <div class="col-lg-3 btn-accept">
-                <button type="button" class="btn btn-success btn-sm">Aceptar</button>
-                <button type="button" class="btn btn-warning btn-sm">Reiniciar</button>
+                <label for="rootName" class="form-label">Carga el archivo Excel</label>
+                <input type="file" class="" id="excel-file" />
               </div>
             </div>
 
             <div class="row">
-              <div class="col-lg-4">
-                <div class="input-group mb-3">
-                  <input type="text" class="form-control form-control-sm" placeholder="Valor N° 5" />
-                  <button class="btn btn-success btn-sm" type="button">Agregar</button>
-                </div>
-              </div>
-              <div class="col-lg-8">
-                <label for="rootName" class="form-label">Valores cargados:</label>
-                <div class="">
-                  <span class="badge rounded-pill bg-info">SI</span>
-                  <span class="badge rounded-pill bg-info">NO</span>
-                  <span class="badge rounded-pill bg-info">SI</span>
-                  <span class="badge rounded-pill bg-info">SI</span>
-                </div>
+              <div class="col-lg-10">
+                <table class="table table-striped" id="table-result">
+                </table>
               </div>
             </div>
           </div>
@@ -100,12 +50,18 @@
             <div class="row">
               <div class="col-3">
                 <h4 class="sub-title text-center">Panel de control</h4>
-                <button type="button" class="btn btn-success btn-sm">Nodo a nodo</button>
-                <button type="button" class="btn btn-info btn-sm">Ejecución completa</button>
+                <button type="button" class="btn btn-success btn-sm">
+                  Nodo a nodo
+                </button>
+                <button type="button" class="btn btn-info btn-sm">
+                  Ejecución completa
+                </button>
               </div>
 
               <div class="col-9">
-                <h4 class="sub-title text-center">Arból de decisión resultante</h4>
+                <h4 class="sub-title text-center">
+                  Arból de decisión resultante
+                </h4>
                 <div class="row">
                   <div class="tree">
                     <ul>
@@ -149,11 +105,15 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
   </body>
   <script src="../main.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+    crossorigin="anonymous"
+  ></script>
+  <script src="https://unpkg.com/read-excel-file@4.x/bundle/read-excel-file.min.js"></script>
 </html>
