@@ -1,6 +1,7 @@
 var gralData = [];
 var rootData = [];
 var entropyGral = 0;
+var variablesNames = [];
 
 var excelFile = document.getElementById("excel-file");
 
@@ -14,6 +15,7 @@ excelFile.addEventListener("change", function () {
       i == 0 ? generateTableHead(table, row) : generateTableRows(table, row);
       i++;
     });
+    variablesNames = data[0];
     rootData = extractRootData(data);
     entropyGral = calculateEntropy(rootData);
   });
@@ -69,11 +71,16 @@ function calculateEntropy(arrayValues) {
   return Math.round(result * 1000) / 1000;
 }
 
-function nodeExecution() {
+function nodeExecution(indexValue) {
   let variablesValues = [];
+  let resultData = {};
+
+  resultData["name"] = variablesNames[indexValue];
+  resultData["index"] = indexValue;
+
   for (let index = 1; index < gralData.length; index++) {
     const element = gralData[index];
-    variablesValues.push(element[1]);
+    variablesValues.push(element[indexValue]);
   }
 
   const counts = variablesValues.reduce(
@@ -87,7 +94,7 @@ function nodeExecution() {
   );
   
   var entropyData = 0;
-
+  var referencesValues = [];
   for (const key in counts) {
     var result = {};
     for (const keyRoot in countsRoot) {
@@ -99,11 +106,12 @@ function nodeExecution() {
       }
       result[`${key}-${keyRoot}`] = count;
     }
+    referencesValues.push(result);
     entropyData += calculatePartialEntropy(result, (gralData.length - 1));
   }
-  //seguir 
-  console.log(entropyGral - entropyData);
-
+  resultData["referenceValues"] = referencesValues;
+  resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
+  return resultData
 }
 
 function calculatePartialEntropy(objValue, total) {
@@ -115,8 +123,35 @@ function calculatePartialEntropy(objValue, total) {
   let acum = 0;
   for (var key in objValue) {
     const element = objValue[key];
-    result += -(element / summed) * logaritmBaseTwo(element / summed);
+    let partialResult = -(element / summed) * logaritmBaseTwo(element / summed);
+    result += isNaN(partialResult) ? 0 : partialResult;
   };
   acum += ((summed/total) * (Math.round(result * 1000) / 1000));
   return acum;
 }
+
+function completeNodeExecution(){
+  var nodeData = [];
+  for (let index = 0; index < variablesNames.length - 1; index++) {
+    const result = nodeExecution(index);
+    nodeData.push(result);
+  }
+  const maxElement = nodeData.reduce(function(prev, current) {
+    return (prev.profit > current.profit) ? prev : current
+  })
+  console.log(maxElement);
+  createNodeElement(maxElement, "theTree");
+}
+
+function createNodeElement(data, fatherElement){
+  var nodeUl = document.createElement("ul");
+  var nodeLi = document.createElement("li");
+  var tagNode = document.createElement("a");
+  tagNode.setAttribute("href", "#");
+  tagNode.setAttribute("id",`index-${data.index}`);
+  tagNode.innerHTML = data.name;
+  nodeLi.appendChild(tagNode);
+  nodeUl.appendChild(nodeLi);
+  document.getElementById(fatherElement).appendChild(nodeUl);
+}
+

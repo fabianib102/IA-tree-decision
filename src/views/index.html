@@ -50,7 +50,7 @@
             <div class="row">
               <div class="col-3">
                 <h4 class="sub-title text-center">Panel de control</h4>
-                <button type="button" class="btn btn-success btn-sm" onclick=nodeExecution()>
+                <button type="button" class="btn btn-success btn-sm" onclick=completeNodeExecution()>
                   Nodo a nodo
                 </button>
                 <button type="button" class="btn btn-info btn-sm">
@@ -63,8 +63,9 @@
                   Arból de decisión resultante
                 </h4>
                 <div class="row">
-                  <div class="tree">
-                    <ul>
+                  <div class="tree" id="theTree">
+                    
+                    <!-- <ul>
                       <li>
                         <a href="#">Parent</a>
                         <ul>
@@ -99,7 +100,7 @@
                           </li>
                         </ul>
                       </li>
-                    </ul>
+                    </ul> -->
                   </div>
                 </div>
               </div>
