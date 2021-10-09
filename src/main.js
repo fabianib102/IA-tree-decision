@@ -1,18 +1,21 @@
-var objectData = {};
+var gralData = [];
+var rootData = [];
+var entropyGral = 0;
 
 var excelFile = document.getElementById("excel-file");
 
 excelFile.addEventListener("change", function () {
   readXlsxFile(excelFile.files[0]).then(function (data) {
     console.log(data);
+    gralData = data;
     var i = 0;
     data.map((row, index) => {
       let table = document.getElementById("table-result");
       i == 0 ? generateTableHead(table, row) : generateTableRows(table, row);
       i++;
     });
-    let rootData = extractRootData(data);
-    calculateEntropy(rootData);
+    rootData = extractRootData(data);
+    entropyGral = calculateEntropy(rootData);
   });
 });
 
@@ -42,10 +45,6 @@ function extractRootData(data) {
   for (let index = 1; index < data.length; index++) {
     const element = data[index];
     rootValues.push(element[lengthData - 1]);
-    // for (let i = 0; i < elements.length; i++) {
-    //   const dataValue = elements[i];
-    //   console.log(dataValue);
-    // }
   }
   console.log(rootValues);
   return rootValues;
@@ -60,15 +59,64 @@ function calculateEntropy(arrayValues) {
   const counts = arrayValues.reduce(
     (cnt, cur) => ((cnt[cur] = cnt[cur] + 1 || 1), cnt),
     {}
-  );  
+  );
   var result = 0;
   for (const key in counts) {
     const element = counts[key];
-    result += (-(element/totalValaues) * logaritmBaseTwo(element/totalValaues));
+    result +=
+      -(element / totalValaues) * logaritmBaseTwo(element / totalValaues);
   }
-  console.log(Math.round(result * 1000) / 1000);
   return Math.round(result * 1000) / 1000;
 }
 
+function nodeExecution() {
+  let variablesValues = [];
+  for (let index = 1; index < gralData.length; index++) {
+    const element = gralData[index];
+    variablesValues.push(element[1]);
+  }
 
+  const counts = variablesValues.reduce(
+    (cnt, cur) => ((cnt[cur] = cnt[cur] + 1 || 1), cnt),
+    {}
+  );
 
+  const countsRoot = rootData.reduce(
+    (cnt, cur) => ((cnt[cur] = cnt[cur] + 1 || 1), cnt),
+    {}
+  );
+  
+  var entropyData = 0;
+
+  for (const key in counts) {
+    var result = {};
+    for (const keyRoot in countsRoot) {
+      let count = 0;
+      for (let i = 0; i < rootData.length; i++) {
+        if (variablesValues[i] == key && rootData[i] == keyRoot) {
+          count += 1;
+        }
+      }
+      result[`${key}-${keyRoot}`] = count;
+    }
+    entropyData += calculatePartialEntropy(result, (gralData.length - 1));
+  }
+  //seguir 
+  console.log(entropyGral - entropyData);
+
+}
+
+function calculatePartialEntropy(objValue, total) {
+  var summed = 0;
+  var result = 0;
+  for (var key in objValue) {
+    summed += objValue[key];
+  };
+  let acum = 0;
+  for (var key in objValue) {
+    const element = objValue[key];
+    result += -(element / summed) * logaritmBaseTwo(element / summed);
+  };
+  acum += ((summed/total) * (Math.round(result * 1000) / 1000));
+  return acum;
+}
