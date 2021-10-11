@@ -92,7 +92,7 @@ function nodeExecution(indexValue) {
     (cnt, cur) => ((cnt[cur] = cnt[cur] + 1 || 1), cnt),
     {}
   );
-  
+
   var entropyData = 0;
   var referencesValues = [];
   for (const key in counts) {
@@ -107,11 +107,11 @@ function nodeExecution(indexValue) {
       result[`${key}-${keyRoot}`] = count;
     }
     referencesValues.push(result);
-    entropyData += calculatePartialEntropy(result, (gralData.length - 1));
+    entropyData += calculatePartialEntropy(result, gralData.length - 1);
   }
   resultData["referenceValues"] = referencesValues;
   resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
-  return resultData
+  return resultData;
 }
 
 function calculatePartialEntropy(objValue, total) {
@@ -119,39 +119,71 @@ function calculatePartialEntropy(objValue, total) {
   var result = 0;
   for (var key in objValue) {
     summed += objValue[key];
-  };
+  }
   let acum = 0;
   for (var key in objValue) {
     const element = objValue[key];
     let partialResult = -(element / summed) * logaritmBaseTwo(element / summed);
     result += isNaN(partialResult) ? 0 : partialResult;
-  };
-  acum += ((summed/total) * (Math.round(result * 1000) / 1000));
+  }
+  acum += (summed / total) * (Math.round(result * 1000) / 1000);
   return acum;
 }
 
-function completeNodeExecution(){
+function completeNodeExecution() {
   var nodeData = [];
   for (let index = 0; index < variablesNames.length - 1; index++) {
     const result = nodeExecution(index);
     nodeData.push(result);
   }
-  const maxElement = nodeData.reduce(function(prev, current) {
-    return (prev.profit > current.profit) ? prev : current
-  })
-  console.log(maxElement);
+  const maxElement = nodeData.reduce(function (prev, current) {
+    return prev.profit > current.profit ? prev : current;
+  });
+  detectRefData(maxElement.referenceValues);
+  removeColumn(maxElement.index);
   createNodeElement(maxElement, "theTree");
 }
 
-function createNodeElement(data, fatherElement){
+function createNodeElement(data, fatherElement) {
   var nodeUl = document.createElement("ul");
   var nodeLi = document.createElement("li");
   var tagNode = document.createElement("a");
   tagNode.setAttribute("href", "#");
-  tagNode.setAttribute("id",`index-${data.index}`);
+  tagNode.setAttribute("id", `index-${data.index}`);
   tagNode.innerHTML = data.name;
   nodeLi.appendChild(tagNode);
   nodeUl.appendChild(nodeLi);
   document.getElementById(fatherElement).appendChild(nodeUl);
 }
 
+function detectRefData(referenceValues) {
+  console.log(referenceValues);
+  var arrayKeys = [];
+
+  for (let index = 0; index < referenceValues.length; index++) {
+    const element = referenceValues[index];
+    for (var key in element) {
+      if (element[key] == 0) {
+        let valueSplit = key.split("-");
+        for (let indexValue = 1; indexValue < gralData.length; indexValue++) {
+          const element = gralData[indexValue];
+          for (let i = 0; i < element.length; i++) {
+            const dataElement = element[i];
+            if( valueSplit[0] == dataElement){
+              arrayKeys.push(indexValue);
+            }
+          }
+        }
+      }
+    }
+  }
+  return arrayKeys;
+}
+
+function removeColumn(indexRemove){
+  for (let index = 0; index < gralData.length; index++) {
+    const element = gralData[index];
+    element.splice(indexRemove, 1);
+  }
+  console.log(gralData);
+}
