@@ -56,6 +56,8 @@ function logaritmBaseTwo(x) {
   return Math.log(x) / Math.log(2);
 }
 
+
+
 function calculateEntropy(arrayValues) {
   const totalValaues = arrayValues.length;
   const counts = arrayValues.reduce(
@@ -72,7 +74,6 @@ function calculateEntropy(arrayValues) {
 }
 
 function nodeExecution(indexValue, theGralData) {
-
   rootData = extractRootData(theGralData);
   entropyGral = calculateEntropy(rootData);
 
@@ -134,38 +135,32 @@ function calculatePartialEntropy(objValue, total) {
   return acum;
 }
 
-function addChildToFather(father, name){
+function addChildToFather(father, name) {
   father.addChild(name);
 }
 
-//esta es la funcion principal
+//Esta es la funcion principal
 function completeNodeExecution() {
-
   var test = recursiveLoop(gralData);
   console.log(test);
 }
 
-
-function recursiveLoop(data){
+function recursiveLoop(data) {
   var element = recursiveTree(data);
-  var conjuntosNuevos = element.newSet;
+  var children = element.newSet;
   var nodo = new Tree(element.name);
 
-  for (let index = 0; index < conjuntosNuevos.length; index++) {
-    const hijo = recursiveTree(conjuntosNuevos[index]);
-    if(hijo.newSet.length > 0){
-      var test = recursiveLoop(conjuntosNuevos[index])
+  for (let index = 0; index < children.length; index++) {
+    const hijo = recursiveTree(children[index]);
+    addChildToFather(nodo, hijo.name);
+    if (hijo.newSet.length > 0) {
+      nodo.addChild(recursiveLoop(hijo.newSet));
     }
-    addChildToFather(nodo, hijo.name)
   }
-
   return nodo;
 }
 
-
-
-
-function analizarRama (theData) {
+/* function analizarRama (theData, fatherName) {
   const hijo = recursiveTree(theData);
   if(hijo.newSet.length > 0){
     for (let index = 0; index < hijo.newSet.length; index++) {
@@ -173,15 +168,7 @@ function analizarRama (theData) {
       
     }
   }
-}
-
-
-
-
-
-
-
-
+} */
 
 function createNodeElement(data, fatherElement) {
   var nodeUl = document.createElement("ul");
@@ -196,7 +183,7 @@ function createNodeElement(data, fatherElement) {
 }
 
 //nuevo createElement
-function justCreate(data){
+function justCreate(data) {
   var nodeLi = document.createElement("li");
   var tagNode = document.createElement("a");
   tagNode.setAttribute("href", "#");
@@ -218,7 +205,7 @@ function detectRefData(referenceValues) {
           const element = gralData[indexValue];
           for (let i = 0; i < element.length; i++) {
             const dataElement = element[i];
-            if( valueSplit[0] == dataElement){
+            if (valueSplit[0] == dataElement) {
               arrayKeys.push(indexValue);
             }
           }
@@ -229,8 +216,7 @@ function detectRefData(referenceValues) {
   return arrayKeys;
 }
 
-function createNewSet(arrayReferences){
-
+function createNewSet(arrayReferences) {
   let newSetData = [];
   var newSet = [];
 
@@ -239,37 +225,38 @@ function createNewSet(arrayReferences){
     let labelPart = "";
     let hasToBePart = true;
     for (const key in element) {
-      labelPart = key.split("-");;
-      if (element[key] == 0){
+      labelPart = key.split("-");
+      if (element[key] == 0) {
         hasToBePart = false;
       }
     }
-    if(hasToBePart){
+    if (hasToBePart) {
       newSetData = [];
       for (let i = 0; i < gralData.length; i++) {
         const element = gralData[i];
-        if(i == 0){
-          newSetData.push(element)
+        if (i == 0) {
+          newSetData.push(element);
         }
         for (let j = 0; j < element.length; j++) {
           let valueData = element[j];
-          if(valueData == labelPart[0]){
-            newSetData.push(element)
+          if (valueData == labelPart[0]) {
+            newSetData.push(element);
           }
         }
       }
       newSet.push(newSetData);
     }
   }
-  return newSet
+  return newSet;
 }
 
-function recursiveTree(group){
+function recursiveTree(group) {
   var result = {};
-  var maxElementSecond = {}; 
+  var maxElementSecond = {};
   var nodeDataSecond = [];
   for (let index = 0; index < variablesNames.length - 1; index++) {
     const result = nodeExecution(index, group);
+    console.log("el result en recursive tree", result);
     nodeDataSecond.push(result);
   }
   maxElementSecond = nodeDataSecond.reduce(function (prev, current) {
@@ -278,9 +265,8 @@ function recursiveTree(group){
 
   result["name"] = maxElementSecond.name;
 
-  //paraa ver 
   var newSetCreatedSecond = createNewSet(maxElementSecond.referenceValues);
-  result["newSet"] = newSetCreatedSecond
+  result["newSet"] = newSetCreatedSecond;
   return result;
 }
 

@@ -1,0 +1,11 @@
+Hipertenso,Colesterol,Trigliceridos,Edad,Diabetico,Problemas Cardiacos
+NO,Bajo,Normal,Menor 40,SI,NO
+SI,Bajo,Elevado,Menor 40,SI,NO
+SI,Bajo,Elevado,Mayor 60,SI,SI
+SI,Medio,Elevado,Mayor 60,NO,SI
+NO,Medio,Elevado,Menor 40,NO,SI
+NO,Medio,Normal,Entre 40 y 60,SI,NO
+SI,Alto,Normal,Entre 40 y 60,SI,SI
+SI,Alto,Normal,Entre 40 y 60,SI,SI
+SI,Alto,Elevado,Mayor 60,NO,SI
+NO,Alto,Normal,Menor 40,NO,NO
