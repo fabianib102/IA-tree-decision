@@ -219,34 +219,70 @@ function detectRefData(referenceValues) {
 function createNewSet(arrayReferences) {
   let newSetData = [];
   var newSet = [];
+  let type = "continuos";
 
-  for (let index = 0; index < arrayReferences.length; index++) {
-    const element = arrayReferences[index];
-    let labelPart = "";
-    let hasToBePart = true;
-    for (const key in element) {
-      labelPart = key.split("-");
-      if (element[key] == 0) {
-        hasToBePart = false;
-      }
-    }
-    if (hasToBePart) {
-      newSetData = [];
-      for (let i = 0; i < gralData.length; i++) {
-        const element = gralData[i];
-        if (i == 0) {
-          newSetData.push(element);
+  if (type == "discrete") {
+    for (let index = 0; index < arrayReferences.length; index++) {
+      const element = arrayReferences[index];
+      let labelPart = "";
+      let hasToBePart = true;
+      for (const key in element) {
+        labelPart = key.split("-");
+        // for what?
+        if (element[key] == 0) {
+          hasToBePart = false;
         }
-        for (let j = 0; j < element.length; j++) {
-          let valueData = element[j];
-          if (valueData == labelPart[0]) {
+      }
+      if (hasToBePart) {
+        console.log("---in hastobePart--->");
+        newSetData = [];
+        for (let i = 0; i < gralData.length; i++) {
+          const element = gralData[i];
+          if (i == 0) {
             newSetData.push(element);
           }
+          for (let j = 0; j < element.length; j++) {
+            let valueData = element[j];
+            if (valueData == labelPart[0]) {
+              newSetData.push(element);
+            }
+          }
+        }
+        newSet.push(newSetData);
+      }
+    }
+  } else {
+    for (let index = 0; index < arrayReferences.length; index++) {
+      const element = arrayReferences[index];
+      let labelPart = "";
+      let hasToBePart = true;
+      for (const key in element) {
+        labelPart = key.split("-");
+        // for what?
+        if (element[key] == 0) {
+          hasToBePart = false;
         }
       }
-      newSet.push(newSetData);
+      if (hasToBePart) {
+        console.log("---in hastobePart--->");
+        newSetData = [];
+        for (let i = 0; i < gralData.length; i++) {
+          const element = gralData[i];
+          if (i == 0) {
+            newSetData.push(element);
+          }
+          for (let j = 0; j < element.length; j++) {
+            let valueData = element[j];
+            if (valueData == labelPart[0]) {
+              newSetData.push(element);
+            }
+          }
+        }
+        newSet.push(newSetData);
+      }
     }
   }
+
   return newSet;
 }
 
@@ -256,7 +292,6 @@ function recursiveTree(group) {
   var nodeDataSecond = [];
   for (let index = 0; index < variablesNames.length - 1; index++) {
     const result = nodeExecution(index, group);
-    console.log("el result en recursive tree", result);
     nodeDataSecond.push(result);
   }
   maxElementSecond = nodeDataSecond.reduce(function (prev, current) {
