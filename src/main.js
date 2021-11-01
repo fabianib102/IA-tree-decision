@@ -91,6 +91,11 @@ function calculateEntropy(arrayValues) {
 }
 
 function nodeExecution(indexValue, theGralData) {
+  console.log("------", indexValue);
+  console.log("the gralDta", theGralData);
+  console.log("the gralData en index", theGralData[1][indexValue]);
+  console.log("------");
+
   let firstValue = theGralData[1][indexValue];
 
   if (isNumeric(firstValue)) {
@@ -130,15 +135,20 @@ function completeNodeExecution() {
 
 function recursiveLoop(data) {
   var element = recursiveTree(data);
+  console.log("1salida element", element);
   var children = element.newSet;
-  var nodo = new Tree(element.name);
+  var nodo = new Nodo(element.name);
 
   for (let index = 0; index < children.length; index++) {
     const hijo = recursiveTree(children[index]);
+    console.log("2salida el hijo", hijo);
     addChildToFather(nodo, hijo.name);
     if (hijo.newSet.length > 0) {
-      nodo.addChild(recursiveLoop(hijo.newSet));
+      nodo.addChild(recursiveLoop(hijo.newSet[index]));
     }
+    /* for (let i = 0; i < hijo.newSet.length; i++) {
+      nodo.addChild(recursiveLoop(hijo.newSet[i]));
+    } */
   }
   return nodo;
 }
@@ -190,12 +200,91 @@ function detectRefData(referenceValues) {
       }
     }
   }
+
   return arrayKeys;
 }
 
-function createNewSet(arrayReferences) {
+let reduceData = [];
+let band = true;
+function createNewSet(arrayReferences, atributeName) {
   let newSetData = [];
   var newSet = [];
+  let indexAtribute = gralData[0].indexOf(atributeName);
+  if (band) {
+    for (let index = 0; index < gralData.length; index++) {
+      const element = gralData[index];
+      reduceData.push([...element]);
+    }
+    band = false;
+  }
+
+  for (let index = 0; index < arrayReferences.length; index++) {
+    const element = arrayReferences[index];
+    let labelPart = "";
+    let hasToBePart = true;
+    for (const key in element) {
+      labelPart = key.split("-");
+      if (element[key] == 0) {
+        hasToBePart = false;
+      }
+    }
+    if (hasToBePart) {
+      newSetData = [];
+      for (let i = 0; i < reduceData.length; i++) {
+        const element = reduceData[i];
+        if (i == 0) {
+          newSetData.push(element);
+        } else {
+          let valueData = element[indexAtribute];
+          if (isNumeric(valueData)) {
+            // processContinous
+            let valueSplit = labelPart[0][0];
+            let signo = valueSplit == ">" ? ">" : "<=";
+            let signoLentgh = signo == ">" ? 1 : 2;
+            let valueArray = labelPart[0].substr(signoLentgh);
+            let valueFloat = parseFloat(valueArray);
+            switch (signo) {
+              case ">":
+                {
+                  if (valueData > valueFloat) {
+                    newSetData.push(element);
+                  }
+                }
+                break;
+              case "<=":
+                if (valueData <= valueFloat) {
+                  newSetData.push(element);
+                }
+                break;
+            }
+          } else {
+            // processDiscrete
+            if (valueData == labelPart[0]) {
+              newSetData.push(element);
+            }
+          }
+        }
+      }
+
+      newSet.push(newSetData);
+    }
+  }
+  //empty arrayReduceData
+  reduceData.length = 0;
+
+  //resguarda la data
+  for (let index = 0; index < newSet.length; index++) {
+    const element = newSet[index];
+    reduceData.push(...element);
+  }
+  console.log("Los datos reducidos", reduceData);
+  return newSet;
+}
+
+/* function createNewSet(arrayReferences, atributeName) {
+  let newSetData = [];
+  var newSet = [];
+  let indexAtribute = gralData[0].indexOf(atributeName);
 
   for (let index = 0; index < arrayReferences.length; index++) {
     const element = arrayReferences[index];
@@ -214,26 +303,24 @@ function createNewSet(arrayReferences) {
         if (i == 0) {
           newSetData.push(element);
         }
-        for (let j = 0; j < element.length; j++) {
-          let valueData = element[j];
+          let valueData = element[indexAtribute];
           if (valueData == labelPart[0]) {
             newSetData.push(element);
           }
-        }
       }
       newSet.push(newSetData);
     }
   }
   return newSet;
 }
-
+ */
 function recursiveTree(group) {
+  console.log("recursive Tree", group);
   var result = {};
   var maxElementSecond = {};
   var nodeDataSecond = [];
   for (let index = 0; index < variablesNames.length - 1; index++) {
     const result = nodeExecution(index, group);
-    //console.log("el result en recursive tree", result);
     nodeDataSecond.push(result);
   }
   maxElementSecond = nodeDataSecond.reduce(function (prev, current) {
@@ -242,18 +329,21 @@ function recursiveTree(group) {
 
   result["name"] = maxElementSecond.name;
 
-  var newSetCreatedSecond = createNewSet(maxElementSecond.referenceValues);
+  var newSetCreatedSecond = createNewSet(
+    maxElementSecond.referenceValues,
+    maxElementSecond.name
+  );
   result["newSet"] = newSetCreatedSecond;
   return result;
 }
 
-var Tree = function (value) {
+var Nodo = function (value) {
   this.name = value;
   this.children = [];
 };
 
-Tree.prototype.addChild = function (value) {
-  var child = new Tree(value);
+Nodo.prototype.addChild = function (value) {
+  var child = new Nodo(value);
   this.children.push(child);
   return child;
 };
