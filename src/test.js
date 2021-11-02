@@ -140,20 +140,15 @@ function recursiveLoop(data) {
   var nodo = new Nodo(element.name);
 
   for (let index = 0; index < children.length; index++) {
-    if (children[index].length > 1) {
-      /* const hijo = recursiveTree(children[index]);
-      console.log("2salida el hijo", hijo); */
-      //addChildToFather(nodo, hijo.name);
-      addChildToFather(nodo, recursiveLoop(children[index]));
-      /* if (hijo.newSet.length > 0) {
-        nodo.addChild(recursiveLoop(hijo.newSet[index]));
-      } */
-      /* for (let i = 0; i < hijo.newSet.length; i++) {
-        if (hijo.newSet[i].length > 1) {
-          nodo.addChild(recursiveLoop(hijo.newSet[i]));
-        }
-      } */
+    const hijo = recursiveTree(children[index]);
+    console.log("2salida el hijo", hijo);
+    addChildToFather(nodo, hijo.name);
+    if (hijo.newSet.length > 0) {
+      nodo.addChild(recursiveLoop(hijo.newSet[index]));
     }
+    /* for (let i = 0; i < hijo.newSet.length; i++) {
+      nodo.addChild(recursiveLoop(hijo.newSet[i]));
+    } */
   }
   return nodo;
 }
@@ -209,91 +204,11 @@ function detectRefData(referenceValues) {
   return arrayKeys;
 }
 
-/* let reduceData = [];
-let band = true;
-function createNewSet(arrayReferences, atributeName) {
-  let newSetData = [];
-  var newSet = [];
-  let indexAtribute = gralData[0].indexOf(atributeName);
-  if (band) {
-    for (let index = 0; index < gralData.length; index++) {
-      const element = gralData[index];
-      reduceData.push([...element]);
-    }
-    band = false;
-  }
-
-  for (let index = 0; index < arrayReferences.length; index++) {
-    const element = arrayReferences[index];
-    let labelPart = "";
-    let hasToBePart = true;
-    for (const key in element) {
-      labelPart = key.split("-");
-      if (element[key] == 0) {
-        hasToBePart = false;
-      }
-    }
-    if (hasToBePart) {
-      newSetData = [];
-      for (let i = 0; i < reduceData.length; i++) {
-        const element = reduceData[i];
-        if (i == 0) {
-          newSetData.push(element);
-        } else {
-          let valueData = element[indexAtribute];
-          if (isNumeric(valueData)) {
-            // processContinous
-            let valueSplit = labelPart[0][0];
-            let signo = valueSplit == ">" ? ">" : "<=";
-            let signoLentgh = signo == ">" ? 1 : 2;
-            let valueArray = labelPart[0].substr(signoLentgh);
-            let valueFloat = parseFloat(valueArray);
-            switch (signo) {
-              case ">":
-                {
-                  if (valueData > valueFloat) {
-                    newSetData.push(element);
-                  }
-                }
-                break;
-              case "<=":
-                if (valueData <= valueFloat) {
-                  newSetData.push(element);
-                }
-                break;
-            }
-          } else {
-            // processDiscrete
-            if (valueData == labelPart[0]) {
-              newSetData.push(element);
-            }
-
-          }
-        }
-      }
-
-      newSet.push(newSetData);
-    }
-  }
-  //empty arrayReduceData
-  reduceData.length = 0;
-
-  //resguarda la data
-  for (let index = 0; index < newSet.length; index++) {
-    const element = newSet[index];
-    reduceData.push(...element);
-  }
-  console.log("Los datos reducidos", reduceData);
-  return newSet;
-} */
-
 let reduceData = [];
 let band = true;
 function createNewSet(arrayReferences, atributeName) {
   let newSetData = [];
   var newSet = [];
-  less = [];
-  greater = [];
   let indexAtribute = gralData[0].indexOf(atributeName);
   if (band) {
     for (let index = 0; index < gralData.length; index++) {
@@ -350,7 +265,7 @@ function createNewSet(arrayReferences, atributeName) {
             }
           } else {
             // processDiscrete
-            typeVar = "discrete";
+            typeVar = "continous";
             if (valueData == labelPart[0]) {
               newSetData.push(element);
             }
@@ -358,7 +273,7 @@ function createNewSet(arrayReferences, atributeName) {
         }
       }
       if (typeVar == "continous") {
-        newSet = [less, greater];
+        newSet = [...greater, ...less];
       } else {
         newSet.push(newSetData);
       }
@@ -375,6 +290,40 @@ function createNewSet(arrayReferences, atributeName) {
   console.log("the newSet####", newSet);
   return newSet;
 }
+
+/* function createNewSet(arrayReferences, atributeName) {
+  let newSetData = [];
+  var newSet = [];
+  let indexAtribute = gralData[0].indexOf(atributeName);
+
+  for (let index = 0; index < arrayReferences.length; index++) {
+    const element = arrayReferences[index];
+    let labelPart = "";
+    let hasToBePart = true;
+    for (const key in element) {
+      labelPart = key.split("-");
+      if (element[key] == 0) {
+        hasToBePart = false;
+      }
+    }
+    if (hasToBePart) {
+      newSetData = [];
+      for (let i = 0; i < gralData.length; i++) {
+        const element = gralData[i];
+        if (i == 0) {
+          newSetData.push(element);
+        }
+          let valueData = element[indexAtribute];
+          if (valueData == labelPart[0]) {
+            newSetData.push(element);
+          }
+      }
+      newSet.push(newSetData);
+    }
+  }
+  return newSet;
+}
+ */
 
 let usedVariables = [];
 
