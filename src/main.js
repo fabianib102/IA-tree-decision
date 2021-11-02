@@ -247,13 +247,13 @@ function createNewSet(arrayReferences, atributeName) {
               case ">":
                 {
                   if (valueData > valueFloat) {
-                    newSetData.push(element);
+                    newSetData[1].push(element);
                   }
                 }
                 break;
               case "<=":
                 if (valueData <= valueFloat) {
-                  newSetData.push(element);
+                  newSetData[0].push(element);
                 }
                 break;
             }
