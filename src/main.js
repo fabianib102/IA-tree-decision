@@ -281,6 +281,7 @@ function createNewSet(arrayReferences, atributeName) {
   return newSet;
 }
 
+
 /* function createNewSet(arrayReferences, atributeName) {
   let newSetData = [];
   var newSet = [];
@@ -314,19 +315,28 @@ function createNewSet(arrayReferences, atributeName) {
   return newSet;
 }
  */
+
+let usedVariables = []; 
+
 function recursiveTree(group) {
   console.log("recursive Tree", group);
   var result = {};
   var maxElementSecond = {};
   var nodeDataSecond = [];
+  let maxElement = -1;
   for (let index = 0; index < variablesNames.length - 1; index++) {
     const result = nodeExecution(index, group);
     nodeDataSecond.push(result);
   }
-  maxElementSecond = nodeDataSecond.reduce(function (prev, current) {
-    return prev.profit > current.profit ? prev : current;
-  });
 
+  for (let index = 0; index < nodeDataSecond.length; index++) {
+    const element = nodeDataSecond[index];
+    if(usedVariables.indexOf(element.name) && (element.profit >= maxElement)){
+      maxElementSecond = element;
+      maxElement = element.profit;
+    }
+  }
+  usedVariables.push(maxElementSecond.name);
   result["name"] = maxElementSecond.name;
 
   var newSetCreatedSecond = createNewSet(
@@ -465,4 +475,11 @@ function processGain(indexValue, theGralData) {
   resultData["referenceValues"] = referencesValues;
   resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
   return resultData;
+}
+
+function removeUsslessColumn(removeIndex, group){
+  for (let index = 0; index < array.length; index++) {
+    const element = array[index];
+    
+  }
 }
