@@ -134,22 +134,31 @@ function completeNodeExecution() {
 }
 
 function recursiveLoop(data) {
-  var element = recursiveTree(data);
+  /* var element = recursiveTree(data);
   console.log("1salida element", element);
   var children = element.newSet;
-  var nodo = new Nodo(element.name);
+  var nodo = new Nodo(element.name); */
 
-  for (let index = 0; index < children.length; index++) {
-    const hijo = recursiveTree(children[index]);
-    console.log("2salida el hijo", hijo);
-    addChildToFather(nodo, hijo.name);
-    if (hijo.newSet.length > 0) {
-      nodo.addChild(recursiveLoop(hijo.newSet[index]));
+  if (data.length == 0) {
+    var nodo = new Nodo("fail");
+    return nodo;
+  } else if (variablesNames.length - 1 == usedVariables) {
+    /* var element = recursiveTree(data);
+    var children = element.newSet; */
+    return nodo;
+  } else {
+    var element = recursiveTree(data);
+    var children = element.newSet;
+    var nodo = new Nodo(element.name);
+    for (let index = 0; index < children.length; index++) {
+      if (variablesNames.length - 1 == usedVariables) {
+        return nodo;
+      } else if (children[index].length > 1) {
+        addChildToFather(nodo, recursiveLoop(children[index]));
+      }
     }
-    /* for (let i = 0; i < hijo.newSet.length; i++) {
-      nodo.addChild(recursiveLoop(hijo.newSet[i]));
-    } */
   }
+
   return nodo;
 }
 
@@ -206,17 +215,12 @@ function detectRefData(referenceValues) {
 
 let reduceData = [];
 let band = true;
-function createNewSet(arrayReferences, atributeName) {
+function createNewSet(arrayReferences, atributeName, reduceData) {
   let newSetData = [];
   var newSet = [];
+  less = [];
+  greater = [];
   let indexAtribute = gralData[0].indexOf(atributeName);
-  if (band) {
-    for (let index = 0; index < gralData.length; index++) {
-      const element = gralData[index];
-      reduceData.push([...element]);
-    }
-    band = false;
-  }
 
   for (let index = 0; index < arrayReferences.length; index++) {
     const element = arrayReferences[index];
@@ -265,7 +269,7 @@ function createNewSet(arrayReferences, atributeName) {
             }
           } else {
             // processDiscrete
-            typeVar = "continous";
+            typeVar = "discrete";
             if (valueData == labelPart[0]) {
               newSetData.push(element);
             }
@@ -273,57 +277,16 @@ function createNewSet(arrayReferences, atributeName) {
         }
       }
       if (typeVar == "continous") {
-        newSet = [...greater, ...less];
+        newSet = [less, greater];
       } else {
         newSet.push(newSetData);
       }
     }
   }
-  //empty arrayReduceData
-  reduceData.length = 0;
 
-  //resguarda la data
-  for (let index = 0; index < newSet.length; index++) {
-    const element = newSet[index];
-    reduceData.push(...element);
-  }
   console.log("the newSet####", newSet);
   return newSet;
 }
-
-/* function createNewSet(arrayReferences, atributeName) {
-  let newSetData = [];
-  var newSet = [];
-  let indexAtribute = gralData[0].indexOf(atributeName);
-
-  for (let index = 0; index < arrayReferences.length; index++) {
-    const element = arrayReferences[index];
-    let labelPart = "";
-    let hasToBePart = true;
-    for (const key in element) {
-      labelPart = key.split("-");
-      if (element[key] == 0) {
-        hasToBePart = false;
-      }
-    }
-    if (hasToBePart) {
-      newSetData = [];
-      for (let i = 0; i < gralData.length; i++) {
-        const element = gralData[i];
-        if (i == 0) {
-          newSetData.push(element);
-        }
-          let valueData = element[indexAtribute];
-          if (valueData == labelPart[0]) {
-            newSetData.push(element);
-          }
-      }
-      newSet.push(newSetData);
-    }
-  }
-  return newSet;
-}
- */
 
 let usedVariables = [];
 
@@ -340,18 +303,23 @@ function recursiveTree(group) {
 
   for (let index = 0; index < nodeDataSecond.length; index++) {
     const element = nodeDataSecond[index];
-    if (usedVariables.indexOf(element.name) && element.profit >= maxElement) {
+    const elementNotExist =
+      usedVariables.indexOf(element.name) == -1 ? true : false;
+    if (elementNotExist && element.profit >= maxElement) {
       maxElementSecond = element;
       maxElement = element.profit;
     }
   }
+
   usedVariables.push(maxElementSecond.name);
   result["name"] = maxElementSecond.name;
 
   var newSetCreatedSecond = createNewSet(
     maxElementSecond.referenceValues,
-    maxElementSecond.name
+    maxElementSecond.name,
+    group
   );
+
   result["newSet"] = newSetCreatedSecond;
   return result;
 }

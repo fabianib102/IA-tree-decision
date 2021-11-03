@@ -3,6 +3,7 @@ var rootData = [];
 var entropyGral = 0;
 var variablesNames = [];
 var mainRoot;
+var resultArr = [];
 
 var excelFile = document.getElementById("excel-file");
 
@@ -123,48 +124,46 @@ function calculatePartialEntropy(objValue, total) {
   return acum;
 }
 
-function addChildToFather(father, name) {
-  father.addChild(name);
-}
-
 //Esta es la funcion principal
 function completeNodeExecution() {
-  var test = recursiveLoop(gralData);
-  console.log(test);
-}
-
-function recursiveLoop(data) {
-  var element = recursiveTree(data);
-  console.log("1salida element", element);
-  var children = element.newSet;
-  var nodo = new Nodo(element.name);
-
-  for (let index = 0; index < children.length; index++) {
-    if (children[index].length > 1) {
-      /* const hijo = recursiveTree(children[index]);
-      console.log("2salida el hijo", hijo); */
-      //addChildToFather(nodo, hijo.name);
-      addChildToFather(nodo, recursiveLoop(children[index]));
-      /* if (hijo.newSet.length > 0) {
-        nodo.addChild(recursiveLoop(hijo.newSet[index]));
-      } */
-      /* for (let i = 0; i < hijo.newSet.length; i++) {
-        if (hijo.newSet[i].length > 1) {
-          nodo.addChild(recursiveLoop(hijo.newSet[i]));
-        }
-      } */
-    }
+  recursiveLoop(gralData, "");
+  console.log(resultArr);
+  createNodeElement(resultArr[0], "theTree", 0);
+  for (let index = 1; index < resultArr.length; index++) {
+    createNodeElement(resultArr[index], `index-${index - 1}`, index);
   }
-  return nodo;
 }
 
-function createNodeElement(data, fatherElement) {
+function recursiveLoop(data, fatherName) {
+  let objTest = {};
+  var resultforescat = recursiveTree(data);
+  objTest["nombre"] = resultforescat.name;
+  objTest["ganancia"] = resultforescat.ganancia;
+  objTest["padre"] = fatherName;
+  resultArr.push(objTest);
+
+  let can = variablesNames.length - 1;
+  let firstCondition = usedVariables.length == can;
+  //condicion de cierre
+  if (firstCondition) {
+    return true;
+  } else {
+    //no anda por que son datos discretos pueden tener mas de un set
+    for (let index = 0; index < resultforescat.newSet.length; index++) {
+      recursiveLoop(resultforescat.newSet[index], resultforescat.name);
+    }
+    //solo anda
+    //recursiveLoop(resultforescat.newSet[0], resultforescat.name)
+  }
+}
+
+function createNodeElement(data, fatherElement, indexId) {
   var nodeUl = document.createElement("ul");
   var nodeLi = document.createElement("li");
   var tagNode = document.createElement("a");
   tagNode.setAttribute("href", "#");
-  tagNode.innerHTML = data.name;
-  nodeLi.setAttribute("id", `index-${data.index}`);
+  tagNode.innerHTML = `Nodo: ${data.nombre} <br> Ganancia: ${data.ganancia}`;
+  nodeLi.setAttribute("id", `index-${indexId}`);
   nodeLi.appendChild(tagNode);
   nodeUl.appendChild(nodeLi);
   document.getElementById(fatherElement).appendChild(nodeUl);
@@ -185,31 +184,7 @@ function justCreate(data) {
   return nodeLi;
 }
 
-function detectRefData(referenceValues) {
-  var arrayKeys = [];
-
-  for (let index = 0; index < referenceValues.length; index++) {
-    const element = referenceValues[index];
-    for (var key in element) {
-      if (element[key] == 0) {
-        let valueSplit = key.split("-");
-        for (let indexValue = 1; indexValue < gralData.length; indexValue++) {
-          const element = gralData[indexValue];
-          for (let i = 0; i < element.length; i++) {
-            const dataElement = element[i];
-            if (valueSplit[0] == dataElement) {
-              arrayKeys.push(indexValue);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return arrayKeys;
-}
-
-/* let reduceData = [];
+let reduceData = [];
 let band = true;
 function createNewSet(arrayReferences, atributeName) {
   let newSetData = [];
@@ -267,7 +242,6 @@ function createNewSet(arrayReferences, atributeName) {
             if (valueData == labelPart[0]) {
               newSetData.push(element);
             }
-
           }
         }
       }
@@ -285,24 +259,12 @@ function createNewSet(arrayReferences, atributeName) {
   }
   console.log("Los datos reducidos", reduceData);
   return newSet;
-} */
+}
 
-let reduceData = [];
-let band = true;
-function createNewSet(arrayReferences, atributeName) {
+/* function createNewSet(arrayReferences, atributeName) {
   let newSetData = [];
   var newSet = [];
-  less = [];
-  greater = [];
   let indexAtribute = gralData[0].indexOf(atributeName);
-  if (band) {
-    for (let index = 0; index < gralData.length; index++) {
-      const element = gralData[index];
-      reduceData.push([...element]);
-    }
-    band = false;
-  }
-
   for (let index = 0; index < arrayReferences.length; index++) {
     const element = arrayReferences[index];
     let labelPart = "";
@@ -315,66 +277,22 @@ function createNewSet(arrayReferences, atributeName) {
     }
     if (hasToBePart) {
       newSetData = [];
-      less = [];
-      greater = [];
-      let typeVar = "";
-      for (let i = 0; i < reduceData.length; i++) {
-        const element = reduceData[i];
+      for (let i = 0; i < gralData.length; i++) {
+        const element = gralData[i];
         if (i == 0) {
           newSetData.push(element);
-          less.push(element);
-          greater.push(element);
-        } else {
-          let valueData = element[indexAtribute];
-          if (isNumeric(valueData)) {
-            // processContinous
-            typeVar = "continous";
-            let valueSplit = labelPart[0][0];
-            let signo = valueSplit == ">" ? ">" : "<=";
-            let signoLentgh = signo == ">" ? 1 : 2;
-            let valueArray = labelPart[0].substr(signoLentgh);
-            let valueFloat = parseFloat(valueArray);
-            switch (signo) {
-              case ">":
-                {
-                  if (valueData > valueFloat) {
-                    greater.push(element);
-                  }
-                }
-                break;
-              case "<=":
-                if (valueData <= valueFloat) {
-                  less.push(element);
-                }
-                break;
-            }
-          } else {
-            // processDiscrete
-            typeVar = "discrete";
-            if (valueData == labelPart[0]) {
-              newSetData.push(element);
-            }
-          }
         }
+          let valueData = element[indexAtribute];
+          if (valueData == labelPart[0]) {
+            newSetData.push(element);
+          }
       }
-      if (typeVar == "continous") {
-        newSet = [less, greater];
-      } else {
-        newSet.push(newSetData);
-      }
+      newSet.push(newSetData);
     }
   }
-  //empty arrayReduceData
-  reduceData.length = 0;
-
-  //resguarda la data
-  for (let index = 0; index < newSet.length; index++) {
-    const element = newSet[index];
-    reduceData.push(...element);
-  }
-  console.log("the newSet####", newSet);
   return newSet;
 }
+ */
 
 let usedVariables = [];
 
@@ -391,13 +309,16 @@ function recursiveTree(group) {
 
   for (let index = 0; index < nodeDataSecond.length; index++) {
     const element = nodeDataSecond[index];
-    if (usedVariables.indexOf(element.name) && element.profit >= maxElement) {
+    const elementNotExist =
+      usedVariables.indexOf(element.name) == -1 ? true : false;
+    if (elementNotExist && element.profit >= maxElement) {
       maxElementSecond = element;
       maxElement = element.profit;
     }
   }
   usedVariables.push(maxElementSecond.name);
   result["name"] = maxElementSecond.name;
+  result["ganancia"] = maxElementSecond.profit;
 
   var newSetCreatedSecond = createNewSet(
     maxElementSecond.referenceValues,
@@ -406,17 +327,6 @@ function recursiveTree(group) {
   result["newSet"] = newSetCreatedSecond;
   return result;
 }
-
-var Nodo = function (value) {
-  this.name = value;
-  this.children = [];
-};
-
-Nodo.prototype.addChild = function (value) {
-  var child = new Nodo(value);
-  this.children.push(child);
-  return child;
-};
 
 function processContinousValues(indexValue, theGralData) {
   let valueContinous = [];
@@ -535,10 +445,4 @@ function processGain(indexValue, theGralData) {
   resultData["referenceValues"] = referencesValues;
   resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
   return resultData;
-}
-
-function removeUsslessColumn(removeIndex, group) {
-  for (let index = 0; index < array.length; index++) {
-    const element = array[index];
-  }
 }
