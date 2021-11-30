@@ -2,8 +2,9 @@ var gralData = [];
 var rootData = [];
 var entropyGral = 0;
 var variablesNames = [];
-var mainRoot;
 var resultArr = [];
+let reduceData = [];
+let usedVariables = [];
 
 var excelFile = document.getElementById("excel-file");
 
@@ -93,14 +94,11 @@ function calculateEntropy(arrayValues) {
 
 function nodeExecution(indexValue, theGralData) {
   let firstValue = theGralData[1][indexValue];
-
   if (isNumeric(firstValue)) {
     return processContinousValues(indexValue, theGralData);
   } else {
     return processGain(indexValue, theGralData);
   }
-
-  console.log("Seguir por acá...");
 }
 
 function calculatePartialEntropy(objValue, total) {
@@ -119,26 +117,93 @@ function calculatePartialEntropy(objValue, total) {
   return acum;
 }
 
-//Esta es la funcion principal
+//Esta es la funcion principal que genera el arbol de decisión
 function completeNodeExecution() {
-  recursiveLoop(gralData, "");
-  createNodeElement(resultArr[0], "theTree", 0);
-  for (let index = 1; index < resultArr.length; index++) {
-    createNodeElement(resultArr[index], `index-${index - 1}`, index);
+
+  let treeData = recursiveLoop(gralData, "");
+
+  console.log(treeData);
+
+  if(gralData.length < 1){
+    return false;
   }
+
+  //run the tree
+  // set the dimensions and margins of the diagram
+  var margin = {top: 40, right: 90, bottom: 50, left: 90},
+  width = 660 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom;
+
+  // declares a tree layout and assigns the size
+  var treemap = d3.tree()
+  .size([width, height]);
+
+  //  assigns the data to a hierarchy using parent-child relationships
+  var nodes = d3.hierarchy(treeData);
+
+  // maps the node data to the tree layout
+  nodes = treemap(nodes);
+
+  // append the svg obgect to the body of the page
+  // appends a 'group' element to 'svg'
+  // moves the 'group' element to the top left margin
+  var svg = d3.select("#mainTree").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom),
+  g = svg.append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // adds the links between the nodes
+  var link = g.selectAll(".link")
+  .data( nodes.descendants().slice(1))
+  .enter().append("path")
+  .attr("class", "link")
+  .attr("d", function(d) {
+    return "M" + d.x + "," + d.y
+      + "C" + d.x + "," + (d.y + d.parent.y) / 2
+      + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
+      + " " + d.parent.x + "," + d.parent.y;
+    });
+
+  // adds each node as a group
+  var node = g.selectAll(".node")
+  .data(nodes.descendants())
+  .enter().append("g")
+  .attr("class", function(d) { 
+    return "node" + 
+      (d.children ? " node--internal" : " node--leaf"); })
+  .attr("transform", function(d) { 
+    return "translate(" + d.x + "," + d.y + ")"; });
+
+  // adds the circle to the node
+  node.append("circle")
+  .attr("r", 10);
+
+  // adds the text to the node
+  node.append("text")
+  .attr("dy", ".35em")
+  .attr("y", function(d) { return d.children ? -20 : 20; })
+  .style("text-anchor", "middle")
+  .text(function(d) { return d.data.value; });
+
+  node.append("text")
+  .attr("y", function(d) { return d.children ? -30 : 30; })
+  .style("text-anchor", "middle")
+  .text(function(d) { return d.data.gain ? `Ganancia: ${d.data.gain}` : ""; });
+
+  node.append("text")
+  .attr("y", function(d) { return d.children ? -40 : 40; })
+  .style("text-anchor", "middle")
+  .text(function(d) { return d.data.umbral; });
+  
+
 }
 
 function recursiveLoop(data, fatherName) {
-  let objTest = {};
   var resultforescat = recursiveTree(data);
-  objTest["nombre"] = resultforescat.name;
-  objTest["ganancia"] = resultforescat.ganancia;
-  objTest["padre"] = fatherName;
-  objTest["class"] = "";
-  objTest["valueReference"] = "";
-  let currentNode = "";
-  resultArr.push(objTest);
-  console.log("resultArr-->", resultArr);
+  let parent = fatherName ? fatherName : "";
+  let nodo = new Tree(resultforescat.name, "", parent, resultforescat.ganancia);
 
   //let can = variablesNames.length - 1;
   //let firstCondition = usedVariables.length == can;
@@ -151,42 +216,38 @@ function recursiveLoop(data, fatherName) {
     for (let index = 0; index < resultforescat.newSet.length; index++) {
       currentNode = resultforescat.newSet[index];
       if (currentNode["values"].length > 0) {
-        recursiveLoop(currentNode["values"], resultforescat.name);
+        nodo.addChild(
+          recursiveLoop(currentNode["values"], resultforescat.name)
+        );
       } else {
-        let obj2 = { ...objTest };
-        obj2["valueReference"] = currentNode["valueReference"];
-        obj2["class"] = currentNode["decision"];
-        resultArr.push(obj2);
+        let newNodo = new Tree(
+          currentNode["decision"],
+          currentNode["valueReference"],
+          nodo.value,
+          ""
+        );
+        nodo.addChild(newNodo);
       }
     }
+    return nodo;
   }
 }
 
-function createNodeElement(data, fatherElement, indexId) {
-  var nodeUl = document.createElement("ul");
-  var nodeLi = document.createElement("li");
-  var tagNode = document.createElement("a");
-  tagNode.setAttribute("href", "#");
-  tagNode.innerHTML = `Nodo: ${data.nombre} <br> Ganancia: ${data.ganancia}`;
-  nodeLi.setAttribute("id", `index-${indexId}`);
-  nodeLi.appendChild(tagNode);
-  nodeUl.appendChild(nodeLi);
-  document.getElementById(fatherElement).appendChild(nodeUl);
-}
+var Tree = function (value, umbral, parent, gain) {
+  this.value = value;
+  this.umbral = umbral;
+  this.parent = parent;
+  this.gain = gain;
+  this.children = [];
+};
+
+Tree.prototype.addChild = function (tree) {
+  this.children.push(tree);
+  return tree;
+};
 
 function isNumeric(value) {
   return /^-?[0-9.,]+/.test(value);
-}
-
-//nuevo createElement
-function justCreate(data) {
-  var nodeLi = document.createElement("li");
-  var tagNode = document.createElement("a");
-  tagNode.setAttribute("href", "#");
-  tagNode.innerHTML = data.name;
-  nodeLi.setAttribute("id", `index-${data.index}`);
-  nodeLi.appendChild(tagNode);
-  return nodeLi;
 }
 
 function getNodeLeaf(element) {
@@ -202,6 +263,7 @@ function getNodeLeaf(element) {
   }
   return nodeLeaf;
 }
+
 function getNodeBranch(element) {
   let nodeBranch = {};
   key = Object.keys(element)[0];
@@ -211,8 +273,6 @@ function getNodeBranch(element) {
   return nodeBranch;
 }
 
-let reduceData = [];
-let band = true;
 function createNewSet(arrayReferences, atributeName, reduceData) {
   let newSetData = [];
   var newSet = [];
@@ -277,8 +337,6 @@ function createNewSet(arrayReferences, atributeName, reduceData) {
   return newSet;
 }
 
-let usedVariables = [];
-
 function recursiveTree(group) {
   var result = {};
   var maxElementSecond = {};
@@ -291,14 +349,12 @@ function recursiveTree(group) {
 
   for (let index = 0; index < nodeDataSecond.length; index++) {
     const element = nodeDataSecond[index];
-    //const elementNotExist = usedVariables.indexOf(element.name) == -1 ? true : false;
     if (element.profit >= maxElement) {
       maxElementSecond = element;
       maxElement = element.profit;
     }
   }
 
-  //usedVariables.push(maxElementSecond.name);
   result["name"] = maxElementSecond.name;
   result["ganancia"] = maxElementSecond.profit;
 

@@ -7,6 +7,25 @@
     <title>IA Evaluación de Nodos</title>
     <link rel="stylesheet" href="../../assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../../assets/css/custom.css" />
+    <style>
+      .node circle {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 3px;
+      }
+
+      .node text { font: 12px sans-serif; }
+
+      .node--internal text {
+        text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+      }
+
+      .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 2px;
+      }
+    </style>
   </head>
   <body>
     <div class="container-fluid">
@@ -60,46 +79,7 @@
                   Arból de decisión resultante
                 </h4>
                 <div class="row">
-                  <div class="tree" id="theTree">
-
-                    <!-- <ul>
-                      <li>
-                        <a href="#">Parent</a>
-                        <ul>
-                          <li>
-                            <a href="#">Child 1</a>
-                            <ul>
-                              <li>
-                                <a href="#">Grand Child</a>
-                              </li>
-                            </ul>
-                          </li>
-                          <li>
-                            <a href="#">Child 2</a>
-                            <ul>
-                              <li><a href="#">Grand Child</a></li>
-                              <li>
-                                <a href="#">Grand Child</a>
-                                <ul>
-                                  <li>
-                                    <a href="#">Great Grand Child</a>
-                                  </li>
-                                  <li>
-                                    <a href="#">Great Grand Child</a>
-                                  </li>
-                                </ul>
-                              </li>
-                              <li><a href="#">Grand Child</a></li>
-                            </ul>
-                          </li>
-                          <li>
-                            <a href="#">Child 3</a>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul> -->
-
-
+                  <div class="tree" id="mainTree">
                   </div>
                 </div>
               </div>
@@ -109,6 +89,7 @@
       </div>
     </div>
   </body>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="../papaparse.min.js"></script>
   <script src="../main.js"></script>
   <script
