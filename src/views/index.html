@@ -45,6 +45,11 @@
               >Ejecución del Algoritmo</a
             >
           </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#executionGain"
+              >Ejecución del Algoritmo (Tasa de Ganancia)</a
+            >
+          </li>
         </ul>
 
         <div id="myTabContent" class="tab-content">
@@ -70,7 +75,7 @@
               <div class="col-3">
                 <h4 class="sub-title text-center">Panel de control</h4>
                 <button type="button" class="btn btn-success btn-sm" onclick=completeNodeExecution()>
-                  Ejecución del Algoritmo
+                  Ejecutar Algoritmo
                 </button>
               </div>
 
@@ -85,6 +90,28 @@
               </div>
             </div>
           </div>
+
+          <div class="tab-pane fade tabCustom" id="executionGain">
+            <div class="row">
+              <div class="col-3">
+                <h4 class="sub-title text-center">Panel de control</h4>
+                <button type="button" class="btn btn-success btn-sm" onclick=completeNodeExecution()>
+                  Ejecutar Algoritmo
+                </button>
+              </div>
+
+              <div class="col-9">
+                <h4 class="sub-title text-center">
+                  Arból de decisión resultante
+                </h4>
+                <div class="row">
+                  <div class="tree" id="mainTreeGain">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

@@ -128,25 +128,15 @@ function completeNodeExecution() {
     return false;
   }
 
-  //run the tree
-  // set the dimensions and margins of the diagram
   var margin = {top: 40, right: 90, bottom: 50, left: 90},
   width = 660 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
 
-  // declares a tree layout and assigns the size
   var treemap = d3.tree()
   .size([width, height]);
-
-  //  assigns the data to a hierarchy using parent-child relationships
   var nodes = d3.hierarchy(treeData);
-
-  // maps the node data to the tree layout
   nodes = treemap(nodes);
 
-  // append the svg obgect to the body of the page
-  // appends a 'group' element to 'svg'
-  // moves the 'group' element to the top left margin
   var svg = d3.select("#mainTree").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom),
@@ -154,7 +144,6 @@ function completeNodeExecution() {
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 
-  // adds the links between the nodes
   var link = g.selectAll(".link")
   .data( nodes.descendants().slice(1))
   .enter().append("path")
@@ -166,7 +155,6 @@ function completeNodeExecution() {
       + " " + d.parent.x + "," + d.parent.y;
     });
 
-  // adds each node as a group
   var node = g.selectAll(".node")
   .data(nodes.descendants())
   .enter().append("g")
@@ -176,11 +164,9 @@ function completeNodeExecution() {
   .attr("transform", function(d) { 
     return "translate(" + d.x + "," + d.y + ")"; });
 
-  // adds the circle to the node
   node.append("circle")
   .attr("r", 10);
 
-  // adds the text to the node
   node.append("text")
   .attr("dy", ".35em")
   .attr("y", function(d) { return d.children ? -20 : 20; })
@@ -197,7 +183,6 @@ function completeNodeExecution() {
   .style("text-anchor", "middle")
   .text(function(d) { return d.data.umbral; });
   
-
 }
 
 function recursiveLoop(data, fatherName) {
@@ -205,14 +190,11 @@ function recursiveLoop(data, fatherName) {
   let parent = fatherName ? fatherName : "";
   let nodo = new Tree(resultforescat.name, "", parent, resultforescat.ganancia);
 
-  //let can = variablesNames.length - 1;
-  //let firstCondition = usedVariables.length == can;
   let firstCondition = data.length == 0;
   //condicion de cierre
   if (firstCondition) {
     return true;
   } else {
-    //no anda por que son datos discretos pueden tener mas de un set
     for (let index = 0; index < resultforescat.newSet.length; index++) {
       currentNode = resultforescat.newSet[index];
       if (currentNode["values"].length > 0) {
@@ -482,6 +464,8 @@ function processGain(indexValue, theGralData) {
     entropyData += calculatePartialEntropy(result, theGralData.length - 1);
   }
   resultData["referenceValues"] = referencesValues;
+  //hacer un if si hay que calcular tasa de ganancia
+  
   resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
   return resultData;
 }
