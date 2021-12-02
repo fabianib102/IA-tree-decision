@@ -1,10 +1,9 @@
+/** importacion de todas las librerias necesarias para la aplicacion */
 const { app, BrowserWindow } = require("electron");
 const url = require("url");
 const path = require("path");
 
-require("electron-reload")(__dirname, {
-
-});
+require("electron-reload")(__dirname, {});
 
 let mainWindow;
 

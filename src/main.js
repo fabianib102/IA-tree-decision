@@ -1,3 +1,6 @@
+/**
+ *  declaracion de variables globales para la aplicacion
+ */
 var gralData = [];
 var rootData = [];
 var entropyGral = 0;
@@ -8,6 +11,9 @@ let usedVariables = [];
 
 var excelFile = document.getElementById("excel-file");
 
+/**
+ *  Funcion encargada de convertir los datos de formato csv a json
+ */
 excelFile.addEventListener("change", function () {
   const dataCsv = excelFile.files[0];
   Papa.parse(dataCsv, {
@@ -43,6 +49,9 @@ excelFile.addEventListener("change", function () {
   });
 });
 
+/**
+ *  Funcion encargada de establecer las cabeceras de la tabla de datos, mostrada por la aplicacion
+ */
 function generateTableHead(table, data) {
   let thead = table.createTHead();
   let row = thead.insertRow();
@@ -63,6 +72,9 @@ function generateTableRows(table, data) {
   });
 }
 
+/**
+ *  Funcion encargada de obtener el mejor, atributos del dataset analizado
+ */
 function extractRootData(data) {
   const lengthData = data[0].length;
   let rootValues = [];
@@ -77,6 +89,10 @@ function logaritmBaseTwo(x) {
   return Math.log(x) / Math.log(2);
 }
 
+/**
+ * Funcion encargada de calcular la entropia,
+ * para un atributo determinado del dataset
+ */
 function calculateEntropy(arrayValues) {
   const totalValaues = arrayValues.length;
   const counts = arrayValues.reduce(
@@ -92,6 +108,9 @@ function calculateEntropy(arrayValues) {
   return Math.round(result * 1000) / 1000;
 }
 
+/**
+ * Funcion encargada de determinar el tipo de dato(continua o discreta) para cada atributo del conjunto de datos (dataset)
+ */
 function nodeExecution(indexValue, theGralData) {
   let firstValue = theGralData[1][indexValue];
   if (isNumeric(firstValue)) {
@@ -116,75 +135,114 @@ function calculatePartialEntropy(objValue, total) {
   acum += (summed / total) * (Math.round(result * 1000) / 1000);
   return acum;
 }
-
-//Esta es la funcion principal que genera el arbol de decisión
+/**
+ * Funcion principal de la aplicacion, encargada de generar el arbol de decision
+ */
 function completeNodeExecution() {
-
   let treeData = recursiveLoop(gralData, "");
 
   console.log(treeData);
 
-  if(gralData.length < 1){
+  if (gralData.length < 1) {
     return false;
   }
 
-  var margin = {top: 40, right: 90, bottom: 50, left: 90},
-  width = 660 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom;
+  /**
+   * definicion y establecimiento de un conjunto de variables, necesarios por la libreria d3, para graficar el arbol adecuadamente.
+   */
+  var margin = { top: 40, right: 90, bottom: 50, left: 90 },
+    width = 660 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-  var treemap = d3.tree()
-  .size([width, height]);
+  var treemap = d3.tree().size([width, height]);
   var nodes = d3.hierarchy(treeData);
   nodes = treemap(nodes);
 
-  var svg = d3.select("#mainTree").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom),
-  g = svg.append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+  var svg = d3
+      .select("#mainTree")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom),
+    g = svg
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  var link = g.selectAll(".link")
-  .data( nodes.descendants().slice(1))
-  .enter().append("path")
-  .attr("class", "link")
-  .attr("d", function(d) {
-    return "M" + d.x + "," + d.y
-      + "C" + d.x + "," + (d.y + d.parent.y) / 2
-      + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
-      + " " + d.parent.x + "," + d.parent.y;
+  var link = g
+    .selectAll(".link")
+    .data(nodes.descendants().slice(1))
+    .enter()
+    .append("path")
+    .attr("class", "link")
+    .attr("d", function (d) {
+      return (
+        "M" +
+        d.x +
+        "," +
+        d.y +
+        "C" +
+        d.x +
+        "," +
+        (d.y + d.parent.y) / 2 +
+        " " +
+        d.parent.x +
+        "," +
+        (d.y + d.parent.y) / 2 +
+        " " +
+        d.parent.x +
+        "," +
+        d.parent.y
+      );
     });
 
-  var node = g.selectAll(".node")
-  .data(nodes.descendants())
-  .enter().append("g")
-  .attr("class", function(d) { 
-    return "node" + 
-      (d.children ? " node--internal" : " node--leaf"); })
-  .attr("transform", function(d) { 
-    return "translate(" + d.x + "," + d.y + ")"; });
+  var node = g
+    .selectAll(".node")
+    .data(nodes.descendants())
+    .enter()
+    .append("g")
+    .attr("class", function (d) {
+      return "node" + (d.children ? " node--internal" : " node--leaf");
+    })
+    .attr("transform", function (d) {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
 
-  node.append("circle")
-  .attr("r", 10);
+  node.append("circle").attr("r", 10);
 
-  node.append("text")
-  .attr("dy", ".35em")
-  .attr("y", function(d) { return d.children ? -20 : 20; })
-  .style("text-anchor", "middle")
-  .text(function(d) { return d.data.value; });
+  node
+    .append("text")
+    .attr("dy", ".35em")
+    .attr("y", function (d) {
+      return d.children ? -20 : 20;
+    })
+    .style("text-anchor", "middle")
+    .text(function (d) {
+      return d.data.value;
+    });
 
-  node.append("text")
-  .attr("y", function(d) { return d.children ? -30 : 30; })
-  .style("text-anchor", "middle")
-  .text(function(d) { return d.data.gain ? `Ganancia: ${d.data.gain}` : ""; });
+  node
+    .append("text")
+    .attr("y", function (d) {
+      return d.children ? -30 : 30;
+    })
+    .style("text-anchor", "middle")
+    .text(function (d) {
+      return d.data.gain ? `Ganancia: ${d.data.gain}` : "";
+    });
 
-  node.append("text")
-  .attr("y", function(d) { return d.children ? -40 : 40; })
-  .style("text-anchor", "middle")
-  .text(function(d) { return d.data.umbral; });
-  
+  node
+    .append("text")
+    .attr("y", function (d) {
+      return d.children ? -40 : 40;
+    })
+    .style("text-anchor", "middle")
+    .text(function (d) {
+      return d.data.umbral;
+    });
 }
 
+/**
+ * Funcion encargada de evaluar atributo del dataset, de manera recursiva
+ */
 function recursiveLoop(data, fatherName) {
   var resultforescat = recursiveTree(data);
   let parent = fatherName ? fatherName : "";
@@ -215,6 +273,13 @@ function recursiveLoop(data, fatherName) {
   }
 }
 
+/**
+ * funtion encarga de definir la estructura de cada nodo del arbol
+ * @param {string} value
+ * @param {float} umbral
+ * @param {Tree} parent
+ * @param {float} gain
+ */
 var Tree = function (value, umbral, parent, gain) {
   this.value = value;
   this.umbral = umbral;
@@ -223,15 +288,28 @@ var Tree = function (value, umbral, parent, gain) {
   this.children = [];
 };
 
+/**
+ * Funcion encargada de agregar a un nodo determinado, nodos hijos
+ */
 Tree.prototype.addChild = function (tree) {
   this.children.push(tree);
   return tree;
 };
 
+/**
+ * Funcion encangada de verificar si un valor determinado de tipo string es un numero
+ * @param {string} value - un valor determinado para verificar si es numerico
+ * @returns boolean
+ */
 function isNumeric(value) {
   return /^-?[0-9.,]+/.test(value);
 }
 
+/**
+ * Funcion encangada de obtener los nodos hojas de un determinado nodo
+ * @param {array} element - element es un array de atributos a evaluar
+ * @returns nodeLeaf
+ */
 function getNodeLeaf(element) {
   let labelPart = "";
   let nodeLeaf = {};
@@ -246,6 +324,11 @@ function getNodeLeaf(element) {
   return nodeLeaf;
 }
 
+/**
+ * Funcion encangada de obtener las rama de un nodo determinado con sus valores asociados a estas.
+ * @param {array} element - element es un array de atributos a evaluar
+ * @returns nodeBranch
+ */
 function getNodeBranch(element) {
   let nodeBranch = {};
   key = Object.keys(element)[0];
@@ -255,6 +338,9 @@ function getNodeBranch(element) {
   return nodeBranch;
 }
 
+/**
+ * funcion encargada de añadir a cada nodo, del arbol
+ */
 function createNewSet(arrayReferences, atributeName, reduceData) {
   let newSetData = [];
   var newSet = [];
@@ -421,6 +507,11 @@ function processContinousValues(indexValue, theGralData) {
   bestTreashold.referenceValues = newReferences;
   return bestTreashold;
 }
+/**
+ * Funcion encangada de obtener la ganancia para un atributo determinado del dataset evaluado.
+ * @param {integer} indexValue - indice del atributo del conjunto de datos a evaluar
+ * @param {array} theGralData - conjunto de datos(dataset a evaluar) en formato de array
+ */
 
 function processGain(indexValue, theGralData) {
   rootData = extractRootData(theGralData);
@@ -465,7 +556,7 @@ function processGain(indexValue, theGralData) {
   }
   resultData["referenceValues"] = referencesValues;
   //hacer un if si hay que calcular tasa de ganancia
-  
+
   resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
   return resultData;
 }
