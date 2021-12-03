@@ -8,6 +8,7 @@ var variablesNames = [];
 var resultArr = [];
 let reduceData = [];
 let usedVariables = [];
+let tasaGanacia;
 
 var excelFile = document.getElementById("excel-file");
 
@@ -138,7 +139,9 @@ function calculatePartialEntropy(objValue, total) {
 /**
  * Funcion principal de la aplicacion, encargada de generar el arbol de decision
  */
-function completeNodeExecution() {
+function completeNodeExecution(executionGain) {
+  tasaGanacia = executionGain;
+
   let treeData = recursiveLoop(gralData, "");
 
   console.log(treeData);
@@ -158,8 +161,10 @@ function completeNodeExecution() {
   var nodes = d3.hierarchy(treeData);
   nodes = treemap(nodes);
 
+  let idTree = tasaGanacia ? "#mainTreeGain" : "#mainTree";
+
   var svg = d3
-      .select("#mainTree")
+      .select(idTree)
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom),
@@ -226,7 +231,9 @@ function completeNodeExecution() {
     })
     .style("text-anchor", "middle")
     .text(function (d) {
-      return d.data.gain ? `Ganancia: ${d.data.gain}` : "";
+      return d.data.gain
+        ? `${tasaGanacia ? "Tasa de Ganancia" : "Ganancia"}: ${d.data.gain}`
+        : "";
     });
 
   node
@@ -237,6 +244,16 @@ function completeNodeExecution() {
     .style("text-anchor", "middle")
     .text(function (d) {
       return d.data.umbral;
+    });
+
+  node
+    .append("text")
+    .attr("y", function (d) {
+      return d.children ? -50 : 50;
+    })
+    .style("text-anchor", "middle")
+    .text(function (d) {
+      return "SI: 3";
     });
 }
 
@@ -555,8 +572,29 @@ function processGain(indexValue, theGralData) {
     entropyData += calculatePartialEntropy(result, theGralData.length - 1);
   }
   resultData["referenceValues"] = referencesValues;
-  //hacer un if si hay que calcular tasa de ganancia
 
-  resultData["profit"] = Math.round((entropyGral - entropyData) * 1000) / 1000;
+  //hacer un if si hay que calcular tasa de ganancia
+  if (tasaGanacia) {
+    let gainData = Math.round((entropyGral - entropyData) * 1000) / 1000;
+    let denominador = calculateDenominador(counts);
+    resultData["profit"] = Number((gainData / denominador).toFixed(3));
+  } else {
+    resultData["profit"] =
+      Math.round((entropyGral - entropyData) * 1000) / 1000;
+  }
   return resultData;
+}
+
+function calculateDenominador(objValues) {
+  let result = 0;
+  let total = 0;
+  Object.keys(objValues).forEach(function (key) {
+    total += objValues[key];
+  });
+
+  Object.keys(objValues).forEach(function (key) {
+    result +=
+      -(objValues[key] / total) * logaritmBaseTwo(objValues[key] / total);
+  });
+  return Number(result.toFixed(3));
 }
