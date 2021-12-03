@@ -246,7 +246,7 @@ function completeNodeExecution(executionGain) {
       return d.data.umbral;
     });
 
-  node
+  /* node
     .append("text")
     .attr("y", function (d) {
       return d.children ? -50 : 50;
@@ -254,16 +254,22 @@ function completeNodeExecution(executionGain) {
     .style("text-anchor", "middle")
     .text(function (d) {
       return "SI: 3";
-    });
+    }); */
 }
 
 /**
  * Funcion encargada de evaluar atributo del dataset, de manera recursiva
  */
-function recursiveLoop(data, fatherName) {
+function recursiveLoop(data, fatherName, umbral) {
   var resultforescat = recursiveTree(data);
   let parent = fatherName ? fatherName : "";
-  let nodo = new Tree(resultforescat.name, "", parent, resultforescat.ganancia);
+  let umbralLabel = umbral ? umbral : "";
+  let nodo = new Tree(
+    resultforescat.name,
+    umbralLabel,
+    parent,
+    resultforescat.ganancia
+  );
 
   let firstCondition = data.length == 0;
   //condicion de cierre
@@ -274,7 +280,11 @@ function recursiveLoop(data, fatherName) {
       currentNode = resultforescat.newSet[index];
       if (currentNode["values"].length > 0) {
         nodo.addChild(
-          recursiveLoop(currentNode["values"], resultforescat.name)
+          recursiveLoop(
+            currentNode["values"],
+            resultforescat.name,
+            currentNode.valueReference
+          )
         );
       } else {
         let newNodo = new Tree(
