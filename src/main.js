@@ -17,10 +17,15 @@ var excelFile = document.getElementById("excel-file");
  */
 excelFile.addEventListener("change", function () {
   const dataCsv = excelFile.files[0];
+  let tableReset = document.getElementById("table-result");
+  tableReset.deleteTHead();
+  gralData = [];
+  variablesNames = [];
   Papa.parse(dataCsv, {
     download: true,
     header: true,
     skipEmptyLines: true,
+    delimiter: ";",
     complete: function (result) {
       for (let index = 0; index < result.data.length; index++) {
         let arrayOfData = [];
@@ -64,6 +69,9 @@ function generateTableHead(table, data) {
   }
 }
 
+/**
+ * establece los valores en la tabla
+ */
 function generateTableRows(table, data) {
   let newRow = table.insertRow(-1);
   data.map((row, index) => {
@@ -86,6 +94,9 @@ function extractRootData(data) {
   return rootValues;
 }
 
+/**
+ * ejecula el logaritmo en base 2
+ */
 function logaritmBaseTwo(x) {
   return Math.log(x) / Math.log(2);
 }
@@ -121,6 +132,9 @@ function nodeExecution(indexValue, theGralData) {
   }
 }
 
+/**
+ * calcula las entropias parciales
+ */
 function calculatePartialEntropy(objValue, total) {
   var summed = 0;
   var result = 0;
@@ -136,6 +150,24 @@ function calculatePartialEntropy(objValue, total) {
   acum += (summed / total) * (Math.round(result * 1000) / 1000);
   return acum;
 }
+
+function zoom() {
+  var scale = d3.event.scale,
+      translation = d3.event.translate,
+      tbound = -h * scale,
+      bbound = h * scale,
+      lbound = (-w + m[1]) * scale,
+      rbound = (w - m[3]) * scale;
+  // limit translation to thresholds
+  translation = [
+      Math.max(Math.min(translation[0], rbound), lbound),
+      Math.max(Math.min(translation[1], bbound), tbound)
+  ];
+  d3.select(".drawarea")
+      .attr("transform", "translate(" + translation + ")" +
+            " scale(" + scale + ")");
+}
+
 /**
  * Funcion principal de la aplicacion, encargada de generar el arbol de decision
  */
@@ -169,6 +201,7 @@ function completeNodeExecution(executionGain) {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom),
     g = svg
+      .call(d3.behavior.zoom().scaleExtent([0.5, 5]).on("zoom", zoom))
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -432,6 +465,10 @@ function createNewSet(arrayReferences, atributeName, reduceData) {
   return newSet;
 }
 
+/**
+ * funcion que devuelve un objeto que será representado en el futuro como nodo
+ * con el nuevo conjunto separado
+ */
 function recursiveTree(group) {
   var result = {};
   var maxElementSecond = {};
@@ -462,6 +499,9 @@ function recursiveTree(group) {
   return result;
 }
 
+/**
+ * procesa conjuntos de valores continuos para discretizarlo
+ */
 function processContinousValues(indexValue, theGralData) {
   let valueContinous = [];
   let midPoint = [];
@@ -534,12 +574,12 @@ function processContinousValues(indexValue, theGralData) {
   bestTreashold.referenceValues = newReferences;
   return bestTreashold;
 }
+
 /**
  * Funcion encangada de obtener la ganancia para un atributo determinado del dataset evaluado.
  * @param {integer} indexValue - indice del atributo del conjunto de datos a evaluar
  * @param {array} theGralData - conjunto de datos(dataset a evaluar) en formato de array
  */
-
 function processGain(indexValue, theGralData) {
   rootData = extractRootData(theGralData);
   entropyGral = calculateEntropy(rootData);
@@ -595,6 +635,9 @@ function processGain(indexValue, theGralData) {
   return resultData;
 }
 
+/**
+ * funcion calcula el denominador, cuando se trata del calculo de la tasa de ganancia
+ */
 function calculateDenominador(objValues) {
   let result = 0;
   let total = 0;

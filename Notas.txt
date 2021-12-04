@@ -1,0 +1,9 @@
+Pasos para la ejecución de la aplicación:
+
+Acceda a la carpeta “”, y haga doble clic en el icono con el nombre “”.
+
+Una vez abierta la aplicación, haga clic en el botón “Carga el archivo Excel”, en la pestaña llamada “Carga de datos”.
+
+En las demás pestañas solo queda, ejecutar el algoritmo con los distintos métodos.
+
+Recuerde que debe tener conexión a internet para la ejecución de la aplicación.
