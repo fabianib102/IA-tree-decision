@@ -7,3 +7,7 @@ Una vez abierta la aplicación, haga clic en el botón “Carga el archivo Excel
 En las demás pestañas solo queda, ejecutar el algoritmo con los distintos métodos.
 
 Recuerde que debe tener conexión a internet para la ejecución de la aplicación.
+
+Recordar NO establecer los valores con coma.
+
+

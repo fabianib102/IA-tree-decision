@@ -9,6 +9,8 @@ var resultArr = [];
 let reduceData = [];
 let usedVariables = [];
 let tasaGanacia;
+let gainExcecuted = true;
+let tasaGain = true;
 
 var excelFile = document.getElementById("excel-file");
 
@@ -21,6 +23,19 @@ excelFile.addEventListener("change", function () {
   tableReset.deleteTHead();
   gralData = [];
   variablesNames = [];
+  gainExcecuted = true;
+  tasaGain = true;
+
+  let treeGainElement = document.getElementById("mainTree");
+  if (typeof document.getElementById("theTree") != "undefined" && document.getElementById("theTree") != null) {
+    treeGainElement.removeChild(document.getElementById("theTree"));
+  }
+
+  let treeGainElementMain = document.getElementById("mainTreeGain");
+  if (typeof document.getElementById("theTreeMain") != "undefined" && document.getElementById("theTreeMain") != null) {
+    treeGainElementMain.removeChild(document.getElementById("theTreeMain"));
+  }
+
   Papa.parse(dataCsv, {
     download: true,
     header: true,
@@ -151,32 +166,24 @@ function calculatePartialEntropy(objValue, total) {
   return acum;
 }
 
-function zoom() {
-  var scale = d3.event.scale,
-      translation = d3.event.translate,
-      tbound = -h * scale,
-      bbound = h * scale,
-      lbound = (-w + m[1]) * scale,
-      rbound = (w - m[3]) * scale;
-  // limit translation to thresholds
-  translation = [
-      Math.max(Math.min(translation[0], rbound), lbound),
-      Math.max(Math.min(translation[1], bbound), tbound)
-  ];
-  d3.select(".drawarea")
-      .attr("transform", "translate(" + translation + ")" +
-            " scale(" + scale + ")");
-}
-
 /**
  * Funcion principal de la aplicacion, encargada de generar el arbol de decision
  */
 function completeNodeExecution(executionGain) {
+  if (executionGain) {
+    if (!tasaGain) {
+      return false;
+    }
+    tasaGain = false;
+  } else {
+    if (!gainExcecuted) {
+      return false;
+    }
+    gainExcecuted = false;
+  }
+
   tasaGanacia = executionGain;
-
   let treeData = recursiveLoop(gralData, "");
-
-  console.log(treeData);
 
   if (gralData.length < 1) {
     return false;
@@ -195,13 +202,15 @@ function completeNodeExecution(executionGain) {
 
   let idTree = tasaGanacia ? "#mainTreeGain" : "#mainTree";
 
+  let treeDraw = tasaGanacia ? "theTreeMain" : "theTree";
+
   var svg = d3
       .select(idTree)
       .append("svg")
+      .attr("id", treeDraw)
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom),
     g = svg
-      .call(d3.behavior.zoom().scaleExtent([0.5, 5]).on("zoom", zoom))
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
